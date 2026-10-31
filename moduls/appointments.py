@@ -15,8 +15,12 @@ def add_appointments(con,client_id,service_id,appt_datetime,status):
 def delete_appointments(con,client_id,service_id,appt_datetime):
     cur = con.cursor()
     cur.execute(
-        """DELETE FROM appointments WHERE client=%s AND service=%s AND dataandtime=%s""",
-        (client_id, service_id, appt_datetime),
+        """UPDATE appointments
+           SET status=%s
+           WHERE client = %s
+             AND service = %s
+             AND dataandtime = %s""",
+        ("cancelled", client_id, service_id, appt_datetime),
     )
     con.commit()
 
@@ -44,3 +48,19 @@ def appointments_by_date(con,appt_datetime):
     my_appointments = cur.fetchall()
     for x in my_appointments:
         print(x)
+
+def get_data(con, data):
+    cur = con.cursor()
+    cur.execute(
+        "SELECT * FROM appointments WHERE dataandtime = %s",
+        (data,),
+    )
+    my_appointment = cur.fetchone()
+    cur.close()
+    return my_appointment
+
+def check_data_and_time(con, vreme):
+
+    return get_data(con, vreme) is not None
+
+

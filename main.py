@@ -1,7 +1,8 @@
+from multiprocessing.forkserver import connect_to_new_process
 from random import choice
 from moduls.clients import add_clients, show_clients, find_client_by_first_name, validation_for_phone
 from moduls.appointments import add_appointments, delete_appointments, writh_appointments, appointments_by_name, \
-    appointments_by_date
+    appointments_by_date,check_data_and_time
 from moduls.db import connection
 from datetime import datetime
 
@@ -47,10 +48,15 @@ while choice!=7:
         datum = input("Datum (GGGG-MM-DD): ")
         vreme = input("Vreme (HH:MM): ")
         dt = datetime.strptime(f"{datum} {vreme}", "%Y-%m-%d %H:%M")
-        if dt.hour < start_work or dt.hour > end_work:
-            print("Nase radno vreme je od 9 do 17 casova. Molimo zakazite svoj termin u tom vremenu")
+        check = check_data_and_time(connection,dt)
+        if check:
+            print("Termin je vec popunjen.")
         else:
-            new_id = add_appointments(connection, client_id, service_id, dt,"added")
+            if dt.hour < start_work or dt.hour > end_work:
+                print("Nase radno vreme je od 9 do 17 casova. Molimo zakazite svoj termin u tom vremenu")
+            else:
+                new_id = add_appointments(connection, client_id, service_id, dt,"scheduled")
+
     if choice==4:
         print("-----Ovo su zakazani terminu------")
         writh_appointments(connection)

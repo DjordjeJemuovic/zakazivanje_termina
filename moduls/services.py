@@ -1,5 +1,5 @@
 from moduls.temp_data import *
-from moduls.db import connection
+
 import pymysql
 
 def insert_sevices (con):
